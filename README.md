@@ -127,3 +127,52 @@ En el desarrollo de aplicaciones móviles iOS, es crucial garantizar que el soft
 ---
 
 *Reto generado automaticamente por Challenge Generator - Pragma*
+
+---
+
+## Proyecto base (Fase 0 completada)
+
+Este repositorio ya está materializado como un **Swift Package** arrancable. No
+necesitas abrir Xcode para compilar ni correr pruebas: todo funciona desde la
+terminal.
+
+### Estructura
+
+```
+Package.swift                       Definición del paquete y targets
+Sources/ChallengeApp/               Aplicación bajo prueba (dominio: billetera)
+  Models.swift                      Account, Transaction, TransactionType, WalletError
+  TransferService.swift             Lógica síncrona: validar y ejecutar transferencias
+  AccountRepository.swift           Fuente de datos asíncrona (async/await)
+  StatementAnalyzer.swift           Análisis de extracto (objetivo de perfilamiento)
+features/BDDTests.swift             Fase 1 — escenarios BDD (esqueleto)
+tests/UnitTests.swift               Fase 2 — pruebas unitarias síncronas (esqueleto)
+tests/AsyncUnitTests.swift          Fase 2 — pruebas unitarias asíncronas (esqueleto)
+profiling/profilingReport.md        Fase 3 — plantilla del reporte de perfilamiento
+```
+
+### Comandos
+
+```bash
+swift build        # compila el proyecto
+swift test         # ejecuta todas las pruebas
+```
+
+Estado inicial de `swift test`: las pruebas de humo (`test_smoke_*`) pasan y
+confirman que el proyecto arranca. El resto están marcadas como `skipped`
+(`XCTSkip`) porque son **tu trabajo** en las fases 1, 2 y 3.
+
+### Qué debes hacer en cada fase
+
+- **Fase 1 (BDD):** completa `features/BDDTests.swift` con escenarios
+  Given/When/Then sobre `TransferService` (y lo que consideres relevante).
+- **Fase 2 (UT):** completa `tests/UnitTests.swift` (lógica síncrona) y
+  `tests/AsyncUnitTests.swift` (métodos `async` del repositorio) con
+  `async`/`await`.
+- **Fase 3 (perfilamiento):** perfila `StatementAnalyzer` (buen punto de
+  partida), documenta hallazgos y mejoras en `profiling/profilingReport.md` y
+  demuestra la mejora con mediciones (`XCTMetric`/`measure` o Instruments).
+
+> Nota: el código de dominio incluye, de forma intencional, oportunidades de
+> mejora (p. ej. en `StatementAnalyzer`). No están resueltas: forman parte del
+> trabajo evaluado del reto.

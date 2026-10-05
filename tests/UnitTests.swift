@@ -1,17 +1,32 @@
 import XCTest
+@testable import ChallengeApp
 
-class UnitTests: XCTestCase {
+/// FASE 2 — Pruebas Unitarias síncronas (TRABAJO DEL CANDIDATO)
+///
+/// Objetivo: validar en aislamiento la lógica de `TransferService` y
+/// `StatementAnalyzer`. Las pruebas deben ser rápidas, deterministas y
+/// enfocadas en una sola cosa (Arrange / Act / Assert).
+///
+/// Ideas de casos (NO implementados a propósito):
+///  - `validate(amount:)` lanza `invalidAmount` con 0 y negativos.
+///  - `transfer(...)` ajusta saldos correctamente en el camino feliz.
+///  - `transfer(...)` lanza `insufficientFunds` cuando no alcanza el saldo.
+///  - `StatementAnalyzer.total(of:in:)` suma solo el tipo indicado.
+///  - `StatementAnalyzer.duplicateTransactionIDs(in:)` detecta duplicados.
+final class UnitTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func test_smoke_statementAnalyzerArranca() {
+        let analyzer = StatementAnalyzer()
+        XCTAssertEqual(analyzer.total(of: .deposit, in: []), 0)
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    // TODO (Fase 2): probar validación de montos inválidos.
+    func test_validate_montoInvalido() throws {
+        throw XCTSkip("Pendiente: implementar prueba unitaria (Fase 2).")
     }
 
-    func testExample() throws {
-        // This is an example of a unit test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    // TODO (Fase 2): probar transferencia exitosa y por fondos insuficientes.
+    func test_transfer_casos() throws {
+        throw XCTSkip("Pendiente: implementar prueba unitaria (Fase 2).")
     }
 }
