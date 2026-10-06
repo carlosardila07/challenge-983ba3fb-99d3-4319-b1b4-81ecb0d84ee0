@@ -1,37 +1,79 @@
 import XCTest
 @testable import ChallengeApp
 
-/// FASE 2 — Pruebas Unitarias asíncronas (TRABAJO DEL CANDIDATO)
-///
-/// Objetivo: probar funcionalidades `async` de `AccountDataSource` /
-/// `InMemoryAccountRepository` usando `async`/`await`.
-///
-/// Ideas de casos (NO implementados a propósito):
-///  - `fetchAccount(id:)` devuelve la cuenta esperada (camino feliz).
-///  - `fetchAccount(id:)` lanza `accountNotFound` para un id inexistente.
-///  - `fetchTransactions(accountId:)` devuelve los movimientos esperados.
-///
-/// Pistas:
-///  - Marca el método de prueba como `async throws` y usa `await`.
-///  - Para verificar errores asíncronos puedes usar `do/catch` + `XCTFail`,
-///    o `await XCTAssertThrowsError(try await ...)` según tu versión.
 final class AsyncUnitTests: XCTestCase {
 
-    func test_smoke_repositorioAsyncArranca() async throws {
-        let repo = InMemoryAccountRepository(
+    private func makeRepository(
+        accounts: [Account],
+        transactions: [String: [Transaction]] = [:]
+    ) -> InMemoryAccountRepository {
+        InMemoryAccountRepository(
+            accounts: accounts,
+            transactions: transactions,
+            latencyNanoseconds: 0
+        )
+    }
+
+    func test_fetchAccount_devuelveLaCuentaEsperada() async throws {
+        let repo = makeRepository(
             accounts: [Account(id: "1", owner: "Ada", balance: 100)]
         )
+
         let account = try await repo.fetchAccount(id: "1")
+
+        XCTAssertEqual(account.id, "1")
         XCTAssertEqual(account.owner, "Ada")
+        XCTAssertEqual(account.balance, 100)
     }
 
-    // TODO (Fase 2): fetchAccount con id inexistente -> accountNotFound.
-    func test_fetchAccount_noEncontrada() async throws {
-        throw XCTSkip("Pendiente: implementar prueba asíncrona (Fase 2).")
+    func test_fetchAccount_lanzaAccountNotFound() async {
+        let repo = makeRepository(
+            accounts: [Account(id: "1", owner: "Ada", balance: 100)]
+        )
+
+        do {
+            _ = try await repo.fetchAccount(id: "999")
+            XCTFail("Se esperaba un error accountNotFound")
+        } catch {
+            XCTAssertEqual(error as? WalletError, .accountNotFound)
+        }
     }
 
-    // TODO (Fase 2): fetchTransactions camino feliz y error.
-    func test_fetchTransactions_casos() async throws {
-        throw XCTSkip("Pendiente: implementar prueba asíncrona (Fase 2).")
+    func test_fetchTransactions_devuelveLosMovimientosEsperados() async throws {
+        let movimientos = [
+            Transaction(id: "a", type: .deposit, amount: 100, date: Date()),
+            Transaction(id: "b", type: .withdrawal, amount: 30, date: Date())
+        ]
+        let repo = makeRepository(
+            accounts: [Account(id: "1", owner: "Ada", balance: 100)],
+            transactions: ["1": movimientos]
+        )
+
+        let result = try await repo.fetchTransactions(accountId: "1")
+
+        XCTAssertEqual(result, movimientos)
+    }
+
+    func test_fetchTransactions_devuelveVacioSiNoHayMovimientos() async throws {
+        let repo = makeRepository(
+            accounts: [Account(id: "1", owner: "Ada", balance: 100)]
+        )
+
+        let result = try await repo.fetchTransactions(accountId: "1")
+
+        XCTAssertTrue(result.isEmpty)
+    }
+
+    func test_fetchTransactions_lanzaAccountNotFound() async {
+        let repo = makeRepository(
+            accounts: [Account(id: "1", owner: "Ada", balance: 100)]
+        )
+
+        do {
+            _ = try await repo.fetchTransactions(accountId: "999")
+            XCTFail("Se esperaba un error accountNotFound")
+        } catch {
+            XCTAssertEqual(error as? WalletError, .accountNotFound)
+        }
     }
 }
